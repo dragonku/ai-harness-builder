@@ -103,7 +103,6 @@ export function Toolbar({ theme, onToggleTheme }: ToolbarProps) {
 
       {/* Brand */}
       <div style={{ padding: "0 16px 0 0", fontSize: 14, letterSpacing: "0.16px", whiteSpace: "nowrap" }}>
-        <span>IBM </span>
         <span style={{ fontWeight: 600 }}>AI Harness Builder</span>
       </div>
 
