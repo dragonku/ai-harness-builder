@@ -18,8 +18,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+    <html lang="ko" data-theme="light" className={`${inter.variable} h-full antialiased`} style={{ WebkitFontSmoothing: "antialiased" }}>
+      <body className="min-h-full flex flex-col" style={{ fontFamily: "var(--font-body)" }}>{children}</body>
     </html>
   );
 }

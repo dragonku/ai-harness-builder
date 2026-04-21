@@ -4,6 +4,8 @@ import { useCallback, useMemo, type DragEvent } from "react";
 import ReactFlow, {
   Background,
   Controls,
+  MiniMap,
+  BackgroundVariant,
   useNodesState,
   useEdgesState,
   addEdge,
@@ -16,7 +18,8 @@ import "reactflow/dist/style.css";
 import { AgentNode } from "./AgentNode";
 import { OrchestratorEdge } from "./OrchestratorEdge";
 import { useHarnessStore } from "@/lib/store";
-import { createAgentNode, type ModelType } from "@/lib/types";
+import { createAgentNode, createHarness, type ModelType } from "@/lib/types";
+import { templates } from "@/lib/templates";
 
 const nodeTypes = { agent: AgentNode };
 const edgeTypes = { orchestrator: OrchestratorEdge };
@@ -38,6 +41,7 @@ export function Canvas() {
   const addAgent = useHarnessStore((s) => s.addAgent);
   const addEdgeToStore = useHarnessStore((s) => s.addEdge);
   const updateAgent = useHarnessStore((s) => s.updateAgent);
+  const loadHarness = useHarnessStore((s) => s.loadHarness);
 
   const flowNodes: Node[] = useMemo(
     () =>
@@ -50,6 +54,7 @@ export function Canvas() {
           model: agent.model,
           skillCount: agent.skills.length,
           toolCount: agent.tools.length,
+          skillNames: agent.skills.map((s) => s.name).filter(Boolean),
         },
       })),
     [harness?.agents],
@@ -144,24 +149,100 @@ export function Canvas() {
     [addAgent],
   );
 
+  const handleNewBlank = useCallback(() => {
+    loadHarness(createHarness({ name: "새 하네스" }));
+  }, [loadHarness]);
+
+  const handleFromTemplate = useCallback(() => {
+    const first = templates[0];
+    if (first) {
+      loadHarness(first.create());
+    }
+  }, [loadHarness]);
+
   if (!harness) {
     return (
-      <div className="flex h-full items-center justify-center bg-zinc-50 dark:bg-zinc-950">
-        <div className="text-center">
-          <p className="text-lg font-medium text-zinc-500 dark:text-zinc-400">
-            하네스를 불러오거나 새로 만들어 주세요
-          </p>
-          <p className="mt-1 text-sm text-zinc-400 dark:text-zinc-500">
-            툴바에서 &ldquo;새로 만들기&rdquo; 버튼을 클릭하거나 템플릿을
-            선택하세요
-          </p>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100%",
+          background: "var(--bg-secondary)",
+          gap: 16,
+        }}
+      >
+        <div
+          style={{
+            width: 56,
+            height: 56,
+            borderRadius: 16,
+            background: "var(--accent-apple)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: 8,
+          }}
+        >
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="3" width="18" height="18" rx="4" stroke="#fff" strokeWidth="1.5"/>
+            <circle cx="8.5" cy="9" r="1.5" fill="#fff"/>
+            <circle cx="15.5" cy="9" r="1.5" fill="#fff"/>
+            <path d="M8 15c1.5 1.5 6.5 1.5 8 0" stroke="#fff" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+        </div>
+        <p
+          style={{
+            fontSize: 20,
+            fontWeight: 600,
+            color: "var(--fg-primary)",
+            letterSpacing: "-0.02em",
+          }}
+        >
+          AI 하네스를 만들어 보세요
+        </p>
+        <p style={{ fontSize: 14, color: "var(--fg-tertiary)", marginTop: -8 }}>
+          에이전트를 배치하고 워크플로우를 설계합니다
+        </p>
+        <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+          <button
+            onClick={handleFromTemplate}
+            style={{
+              padding: "8px 20px",
+              borderRadius: 980,
+              background: "var(--accent-apple)",
+              color: "#fff",
+              fontSize: 13,
+              fontWeight: 500,
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            템플릿에서 시작
+          </button>
+          <button
+            onClick={handleNewBlank}
+            style={{
+              padding: "8px 20px",
+              borderRadius: 980,
+              background: "transparent",
+              color: "var(--fg-accent)",
+              fontSize: 13,
+              fontWeight: 500,
+              border: "1px solid var(--border-default)",
+              cursor: "pointer",
+            }}
+          >
+            빈 캔버스에서 시작
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="h-full w-full">
+    <div style={{ height: "100%", width: "100%" }}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -176,10 +257,15 @@ export function Canvas() {
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         fitView
-        className="bg-zinc-50 dark:bg-zinc-950"
+        style={{ background: "var(--bg-secondary)" }}
       >
-        <Background />
-        <Controls />
+        <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="var(--fg-tertiary)" style={{ opacity: 0.4 }} />
+        <Controls showInteractive={false} />
+        <MiniMap
+          style={{ width: 120, height: 80 }}
+          nodeColor={() => "var(--accent-apple)"}
+          maskColor="var(--bg-secondary)"
+        />
       </ReactFlow>
     </div>
   );

@@ -81,6 +81,69 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Apple-inspired tokens */
+  --apple-blue: #0071e3;
+  --apple-near-black: #1d1d1f;
+  --apple-light-bg: #f5f5f7;
+
+  /* Semantic - light */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f7;
+  --bg-elevated: #ffffff;
+  --bg-nav: rgba(255,255,255,0.72);
+  --fg-primary: #1d1d1f;
+  --fg-secondary: rgba(0,0,0,0.8);
+  --fg-tertiary: rgba(0,0,0,0.48);
+  --fg-accent: #0066cc;
+  --accent-apple: #0071e3;
+  --border-subtle: rgba(0,0,0,0.06);
+  --border-default: rgba(0,0,0,0.1);
+  --shadow-card: 0 2px 12px rgba(0,0,0,0.06);
+  --shadow-float: 3px 5px 30px rgba(0,0,0,0.12);
+  --shadow-node: 0 1px 4px rgba(0,0,0,0.06);
+  --shadow-node-hover: 0 4px 20px rgba(0,0,0,0.1);
+  --shadow-node-selected: 0 0 0 3px rgba(0,113,227,0.3);
+
+  /* Model colors */
+  --model-haiku: #34c759;
+  --model-haiku-bg: rgba(52,199,89,0.1);
+  --model-haiku-border: rgba(52,199,89,0.2);
+  --model-sonnet: #0071e3;
+  --model-sonnet-bg: rgba(0,113,227,0.1);
+  --model-sonnet-border: rgba(0,113,227,0.2);
+  --model-opus: #af52de;
+  --model-opus-bg: rgba(175,82,222,0.1);
+  --model-opus-border: rgba(175,82,222,0.2);
+
+  /* Font */
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  --font-mono: "SF Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+[data-theme="dark"] {
+  --bg-primary: #000000;
+  --bg-secondary: #161617;
+  --bg-elevated: #1c1c1e;
+  --bg-nav: rgba(0,0,0,0.72);
+  --fg-primary: #ffffff;
+  --fg-secondary: rgba(255,255,255,0.8);
+  --fg-tertiary: rgba(255,255,255,0.48);
+  --fg-accent: #2997ff;
+  --accent-apple: #0071e3;
+  --border-subtle: rgba(255,255,255,0.06);
+  --border-default: rgba(255,255,255,0.1);
+  --shadow-card: 0 2px 12px rgba(0,0,0,0.3);
+  --shadow-float: 3px 5px 30px rgba(0,0,0,0.4);
+  --shadow-node: 0 1px 4px rgba(0,0,0,0.2);
+  --shadow-node-hover: 0 4px 20px rgba(0,0,0,0.4);
+  --shadow-node-selected: 0 0 0 3px rgba(41,151,255,0.35);
+  --model-haiku-bg: rgba(52,199,89,0.12);
+  --model-haiku-border: rgba(52,199,89,0.25);
+  --model-sonnet-bg: rgba(0,113,227,0.12);
+  --model-sonnet-border: rgba(0,113,227,0.25);
+  --model-opus-bg: rgba(175,82,222,0.12);
+  --model-opus-border: rgba(175,82,222,0.25);
 }
 
 .dark {
@@ -135,4 +198,41 @@
 }
 .react-flow__node:active {
   cursor: grabbing;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--fg-tertiary); border-radius: 3px; }
+
+/* Animations */
+@keyframes exportProgress { 0% { width: 0; } 100% { width: 100%; } }
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
+
+/* React Flow overrides for Apple design */
+.react-flow__background {
+  background-color: var(--bg-secondary) !important;
+}
+.react-flow__controls {
+  box-shadow: var(--shadow-card) !important;
+  border-radius: 10px !important;
+  border: 1px solid var(--border-subtle) !important;
+  overflow: hidden;
+}
+.react-flow__controls-button {
+  background: var(--bg-primary) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  color: var(--fg-primary) !important;
+  fill: var(--fg-primary) !important;
+  width: 28px !important;
+  height: 28px !important;
+}
+.react-flow__controls-button:hover {
+  background: var(--bg-secondary) !important;
+}
+.react-flow__minimap {
+  border-radius: 8px !important;
+  box-shadow: var(--shadow-card) !important;
+  border: 1px solid var(--border-subtle) !important;
+  overflow: hidden;
 }

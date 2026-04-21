@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"npx tsc --noEmit 2>&1\",\"timeout\":120000,\"description\":\"TypeScript type check\"}",
+  "error": "Exit code 2\nsrc/components/icons/RoleIcon.tsx(5,62): error TS2503: Cannot find namespace 'JSX'.",
+  "timestamp": "2026-04-21T11:37:23.126Z",
+  "retry_count": 1
+}

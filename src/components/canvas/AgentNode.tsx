@@ -1,9 +1,10 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useState, useRef } from "react";
 import { Handle, Position, type NodeProps } from "reactflow";
-import { Badge } from "@/components/ui/badge";
 import { useHarnessStore } from "@/lib/store";
+import { MC } from "@/lib/model-colors";
+import { RoleIcon } from "@/components/icons/RoleIcon";
 import type { ModelType } from "@/lib/types";
 
 interface AgentNodeData {
@@ -11,63 +12,168 @@ interface AgentNodeData {
   readonly model: ModelType;
   readonly skillCount: number;
   readonly toolCount: number;
+  readonly skillNames?: readonly string[];
 }
-
-const modelColors: Record<ModelType, string> = {
-  haiku: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-  sonnet: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-  opus: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
-};
 
 function AgentNodeComponent({ id, data }: NodeProps<AgentNodeData>) {
   const selectedNodeId = useHarnessStore((s) => s.selectedNodeId);
   const isSelected = selectedNodeId === id;
+  const [isHovered, setIsHovered] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const tooltipTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const mc = MC[data.model];
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    if (data.skillCount > 0 && data.skillNames && data.skillNames.length > 0) {
+      tooltipTimer.current = setTimeout(() => setShowTooltip(true), 500);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setShowTooltip(false);
+    if (tooltipTimer.current) {
+      clearTimeout(tooltipTimer.current);
+      tooltipTimer.current = null;
+    }
+  };
 
   return (
     <div
-      className={`rounded-lg border-2 bg-white px-4 py-3 shadow-sm transition-colors dark:bg-zinc-900 ${
-        isSelected
-          ? "border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800"
-          : "border-zinc-200 dark:border-zinc-700"
-      }`}
-      style={{ minWidth: 160 }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        position: "relative",
+        minWidth: 180,
+        background: "var(--bg-primary)",
+        borderRadius: 12,
+        border: "1px solid var(--border-subtle)",
+        boxShadow: isSelected
+          ? "var(--shadow-node-selected)"
+          : isHovered
+            ? "var(--shadow-node-hover)"
+            : "var(--shadow-node)",
+        transition: "box-shadow 0.2s ease, transform 0.2s ease",
+        transform: isHovered ? "translateY(-1px)" : "none",
+        overflow: "hidden",
+        cursor: "grab",
+      }}
     >
-      <Handle
-        type="target"
-        position={Position.Left}
-        className="!h-3 !w-3 !border-2 !border-white !bg-zinc-400 dark:!border-zinc-900"
-      />
+      {/* Top color bar */}
+      <div style={{ height: 3, background: mc.color, width: "100%" }} />
 
-      <div className="flex flex-col gap-1.5">
-        <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-          {data.role}
+      <div style={{ padding: "12px 14px 14px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+          {/* Role icon */}
+          <div
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: "50%",
+              background: mc.bg,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <RoleIcon role={data.role} size={15} color={mc.color} />
+          </div>
+
+          <span
+            style={{
+              fontSize: 13,
+              fontWeight: 600,
+              color: "var(--fg-primary)",
+              letterSpacing: "-0.01em",
+            }}
+          >
+            {data.role}
+          </span>
         </div>
 
-        <div className="flex items-center gap-1.5">
+        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+          {/* Model badge */}
           <span
-            className={`inline-flex h-5 items-center rounded-full px-2 text-xs font-medium ${modelColors[data.model]}`}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              height: 20,
+              padding: "0 8px",
+              borderRadius: 10,
+              fontSize: 11,
+              fontWeight: 500,
+              background: mc.bg,
+              color: mc.color,
+              border: `1px solid ${mc.border}`,
+            }}
           >
             {data.model}
           </span>
 
           {data.skillCount > 0 && (
-            <Badge variant="secondary" className="text-xs">
+            <span style={{ fontSize: 11, color: "var(--fg-tertiary)" }}>
               {data.skillCount} skill{data.skillCount > 1 ? "s" : ""}
-            </Badge>
+            </span>
+          )}
+
+          {data.toolCount > 0 && (
+            <span style={{ fontSize: 11, color: "var(--fg-tertiary)" }}>
+              {data.toolCount} tool{data.toolCount > 1 ? "s" : ""}
+            </span>
           )}
         </div>
-
-        {data.toolCount > 0 && (
-          <div className="text-xs text-zinc-500 dark:text-zinc-400">
-            {data.toolCount} tool{data.toolCount > 1 ? "s" : ""}
-          </div>
-        )}
       </div>
 
+      {/* Tooltip */}
+      {showTooltip && data.skillNames && data.skillNames.length > 0 && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: "calc(100% + 6px)",
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "var(--bg-elevated)",
+            border: "1px solid var(--border-default)",
+            borderRadius: 8,
+            padding: "6px 10px",
+            boxShadow: "var(--shadow-float)",
+            fontSize: 11,
+            color: "var(--fg-secondary)",
+            whiteSpace: "nowrap",
+            zIndex: 100,
+            pointerEvents: "none",
+          }}
+        >
+          {data.skillNames.join(", ")}
+        </div>
+      )}
+
+      <Handle
+        type="target"
+        position={Position.Left}
+        style={{
+          width: 12,
+          height: 12,
+          borderRadius: "50%",
+          border: `2px solid ${mc.color}`,
+          background: "var(--bg-primary)",
+          left: -6,
+        }}
+      />
       <Handle
         type="source"
         position={Position.Right}
-        className="!h-3 !w-3 !border-2 !border-white !bg-zinc-400 dark:!border-zinc-900"
+        style={{
+          width: 12,
+          height: 12,
+          borderRadius: "50%",
+          border: `2px solid ${mc.color}`,
+          background: "var(--bg-primary)",
+          right: -6,
+        }}
       />
     </div>
   );
