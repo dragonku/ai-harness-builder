@@ -8,26 +8,28 @@ import { Toolbar } from "@/components/toolbar/Toolbar";
 import { useHarnessStore } from "@/lib/store";
 import { saveHarness } from "@/lib/db";
 
+type CarbonTheme = "white" | "g90" | "g100";
+
 export default function Home() {
-  const [darkMode, setDarkMode] = useState(false);
+  const [theme, setTheme] = useState<CarbonTheme>("white");
   const harness = useHarnessStore((s) => s.harness);
   const selectedNodeId = useHarnessStore((s) => s.selectedNodeId);
   const removeAgent = useHarnessStore((s) => s.removeAgent);
 
-  // Initialize dark mode from localStorage
+  // Initialize theme from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem("harness-dark-mode");
-    if (saved === "true") {
-      setDarkMode(true);
-      document.documentElement.setAttribute("data-theme", "dark");
+    const saved = localStorage.getItem("cds-theme") as CarbonTheme | null;
+    if (saved && (saved === "white" || saved === "g90" || saved === "g100")) {
+      setTheme(saved);
+      document.documentElement.setAttribute("data-carbon-theme", saved);
     }
   }, []);
 
-  const toggleDarkMode = useCallback(() => {
-    setDarkMode((prev) => {
-      const next = !prev;
-      document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
-      localStorage.setItem("harness-dark-mode", String(next));
+  const toggleTheme = useCallback(() => {
+    setTheme((prev) => {
+      const next: CarbonTheme = prev === "white" ? "g100" : "white";
+      document.documentElement.setAttribute("data-carbon-theme", next);
+      localStorage.setItem("cds-theme", next);
       return next;
     });
   }, []);
@@ -59,8 +61,8 @@ export default function Home() {
   }, [selectedNodeId, removeAgent, harness]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh", background: "var(--bg-primary)" }}>
-      <Toolbar darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh", background: "var(--cds-background)", color: "var(--cds-text-primary)" }}>
+      <Toolbar theme={theme} onToggleTheme={toggleTheme} />
       <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
         <Sidebar />
         <main style={{ flex: 1, position: "relative" }}>

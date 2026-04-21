@@ -20,6 +20,8 @@ import { OrchestratorEdge } from "./OrchestratorEdge";
 import { useHarnessStore } from "@/lib/store";
 import { createAgentNode, createHarness, type ModelType } from "@/lib/types";
 import { templates } from "@/lib/templates";
+import { CarbonIcon } from "@/components/icons/CarbonIcon";
+import { MODEL_META } from "@/lib/model-colors";
 
 const nodeTypes = { agent: AgentNode };
 const edgeTypes = { orchestrator: OrchestratorEdge };
@@ -150,7 +152,7 @@ export function Canvas() {
   );
 
   const handleNewBlank = useCallback(() => {
-    loadHarness(createHarness({ name: "새 하네스" }));
+    loadHarness(createHarness({ name: "Untitled harness" }));
   }, [loadHarness]);
 
   const handleFromTemplate = useCallback(() => {
@@ -160,82 +162,94 @@ export function Canvas() {
     }
   }, [loadHarness]);
 
+  // Empty state
   if (!harness) {
     return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "100%",
-          background: "var(--bg-secondary)",
-          gap: 16,
-        }}
-      >
-        <div
-          style={{
-            width: 56,
-            height: 56,
-            borderRadius: 16,
-            background: "var(--accent-apple)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: 8,
-          }}
-        >
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-            <rect x="3" y="3" width="18" height="18" rx="4" stroke="#fff" strokeWidth="1.5"/>
-            <circle cx="8.5" cy="9" r="1.5" fill="#fff"/>
-            <circle cx="15.5" cy="9" r="1.5" fill="#fff"/>
-            <path d="M8 15c1.5 1.5 6.5 1.5 8 0" stroke="#fff" strokeWidth="1.5" strokeLinecap="round"/>
-          </svg>
-        </div>
-        <p
-          style={{
-            fontSize: 20,
-            fontWeight: 600,
-            color: "var(--fg-primary)",
-            letterSpacing: "-0.02em",
-          }}
-        >
-          AI 하네스를 만들어 보세요
-        </p>
-        <p style={{ fontSize: 14, color: "var(--fg-tertiary)", marginTop: -8 }}>
-          에이전트를 배치하고 워크플로우를 설계합니다
-        </p>
-        <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
-          <button
-            onClick={handleFromTemplate}
-            style={{
-              padding: "8px 20px",
-              borderRadius: 980,
-              background: "var(--accent-apple)",
-              color: "#fff",
-              fontSize: 13,
-              fontWeight: 500,
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
-            템플릿에서 시작
-          </button>
-          <button
-            onClick={handleNewBlank}
-            style={{
-              padding: "8px 20px",
-              borderRadius: 980,
-              background: "transparent",
-              color: "var(--fg-accent)",
-              fontSize: 13,
-              fontWeight: 500,
-              border: "1px solid var(--border-default)",
-              cursor: "pointer",
-            }}
-          >
-            빈 캔버스에서 시작
-          </button>
+      <div style={{ flex: 1, position: "relative", overflow: "hidden", background: "var(--cds-background)", height: "100%" }}>
+        {/* Dot grid background */}
+        <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.6 }}>
+          <defs>
+            <pattern id="dotgrid-empty" width={16} height={16} patternUnits="userSpaceOnUse">
+              <circle cx={8} cy={8} r={1} fill="var(--cds-border-subtle-00)" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#dotgrid-empty)" />
+        </svg>
+        {/* Empty state card */}
+        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ width: 480, background: "var(--cds-layer-01)", border: "1px solid var(--cds-border-subtle-00)", padding: 32 }}>
+            <CarbonIcon name="workflow" size={20} color="var(--cds-icon-secondary)" style={{ marginBottom: 16 }} />
+            <h2 style={{
+              fontSize: "var(--cds-heading-04-size)",
+              lineHeight: "var(--cds-heading-04-lh)",
+              fontWeight: 400,
+              color: "var(--cds-text-primary)",
+              marginBottom: 8,
+            }}>
+              Create an AI harness
+            </h2>
+            <p style={{ fontSize: 14, lineHeight: "18px", letterSpacing: "0.16px", color: "var(--cds-text-secondary)", marginBottom: 24 }}>
+              Start from a template, or drag agents from the palette to compose a new pipeline.
+            </p>
+            <div style={{ display: "flex", gap: 1 }}>
+              <button
+                onClick={handleFromTemplate}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = "var(--cds-button-primary-hover)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = "var(--cds-button-primary)";
+                }}
+                style={{
+                  flex: 1,
+                  height: 48,
+                  padding: "0 64px 0 16px",
+                  background: "var(--cds-button-primary)",
+                  color: "#fff",
+                  border: "none",
+                  fontSize: 14,
+                  letterSpacing: "0.16px",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  position: "relative",
+                }}
+              >
+                Use template
+                <span style={{ position: "absolute", right: 16 }}>
+                  <CarbonIcon name="template" size={20} color="#fff" />
+                </span>
+              </button>
+              <button
+                onClick={handleNewBlank}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = "var(--cds-button-secondary-hover)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = "var(--cds-button-secondary)";
+                }}
+                style={{
+                  flex: 1,
+                  height: 48,
+                  padding: "0 64px 0 16px",
+                  background: "var(--cds-button-secondary)",
+                  color: "#fff",
+                  border: "none",
+                  fontSize: 14,
+                  letterSpacing: "0.16px",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  position: "relative",
+                }}
+              >
+                Start blank
+                <span style={{ position: "absolute", right: 16 }}>
+                  <CarbonIcon name="add" size={20} color="#fff" />
+                </span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -257,14 +271,20 @@ export function Canvas() {
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         fitView
-        style={{ background: "var(--bg-secondary)" }}
+        style={{ background: "var(--cds-background)" }}
       >
-        <Background variant={BackgroundVariant.Dots} gap={24} size={1} color="var(--fg-tertiary)" style={{ opacity: 0.4 }} />
+        <Background variant={BackgroundVariant.Dots} gap={16} size={1} color="var(--cds-border-subtle-00)" />
         <Controls showInteractive={false} />
         <MiniMap
-          style={{ width: 120, height: 80 }}
-          nodeColor={() => "var(--accent-apple)"}
-          maskColor="var(--bg-secondary)"
+          style={{ width: 160, height: 100 }}
+          nodeColor={(node) => {
+            const model = node.data?.model as keyof typeof MODEL_META | undefined;
+            if (model && MODEL_META[model]) {
+              return MODEL_META[model].dotColor;
+            }
+            return "var(--cds-interactive)";
+          }}
+          maskColor="var(--cds-background)"
         />
       </ReactFlow>
     </div>

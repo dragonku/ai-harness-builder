@@ -2,79 +2,80 @@
 
 import { templates } from "@/lib/templates";
 import { useHarnessStore } from "@/lib/store";
+import { CarbonIcon } from "@/components/icons/CarbonIcon";
 
 export function TemplateGallery() {
   const loadHarness = useHarnessStore((s) => s.loadHarness);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+    <>
+      <div style={{ fontSize: 12, letterSpacing: "0.32px", color: "var(--cds-text-helper)", padding: "12px 16px 8px" }}>
+        Start from a template
+      </div>
       {templates.map((template) => (
         <div
           key={template.id}
-          style={{
-            background: "var(--bg-primary)",
-            borderRadius: 12,
-            border: "1px solid var(--border-subtle)",
-            padding: 16,
-            boxShadow: "var(--shadow-card)",
-          }}
+          style={{ background: "var(--cds-background)", padding: 16, marginBottom: 1 }}
         >
-          <div
-            style={{
-              fontSize: 14,
-              fontWeight: 600,
-              color: "var(--fg-primary)",
-              marginBottom: 4,
-              letterSpacing: "-0.01em",
-            }}
-          >
+          <div style={{ fontSize: 14, fontWeight: 600, letterSpacing: "0.16px", color: "var(--cds-text-primary)", marginBottom: 4 }}>
             {template.name}
           </div>
-          <div
-            style={{
-              fontSize: 12,
-              color: "var(--fg-tertiary)",
-              marginBottom: 12,
-              lineHeight: 1.4,
-            }}
-          >
+          <div style={{ fontSize: 12, color: "var(--cds-text-secondary)", letterSpacing: "0.32px", lineHeight: "16px", marginBottom: 8 }}>
             {template.description}
           </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-            <span style={{ fontSize: 11, color: "var(--fg-tertiary)" }}>
-              에이전트 {template.agentCount}개
-            </span>
-            <span style={{ fontSize: 11, color: "var(--fg-tertiary)" }}>
-              페이즈 {template.phaseCount}개
-            </span>
+          <div style={{ fontSize: 12, color: "var(--cds-text-helper)", letterSpacing: "0.32px", marginBottom: 12, display: "flex", gap: 8 }}>
+            <span>{template.agentCount} agents</span>
+            <span>&middot;</span>
+            <span>{template.phaseCount} phases</span>
           </div>
-
+          <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 12 }}>
+            {template.tags.map((tag) => (
+              <span
+                key={tag}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  height: 24,
+                  padding: "0 8px",
+                  fontSize: 12,
+                  letterSpacing: "0.32px",
+                  background: "var(--cds-gray-20)",
+                  color: "var(--cds-text-primary)",
+                }}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
           <button
             onClick={() => loadHarness(template.create())}
-            style={{
-              width: "100%",
-              padding: "8px 0",
-              borderRadius: 8,
-              background: "var(--accent-apple)",
-              color: "#fff",
-              fontSize: 13,
-              fontWeight: 500,
-              border: "none",
-              cursor: "pointer",
-              transition: "opacity 0.15s ease",
-            }}
             onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.opacity = "0.85";
+              (e.currentTarget as HTMLElement).style.background = "var(--cds-button-primary-hover)";
             }}
             onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.opacity = "1";
+              (e.currentTarget as HTMLElement).style.background = "var(--cds-button-primary)";
+            }}
+            style={{
+              width: "100%",
+              height: 40,
+              padding: "0 16px",
+              fontSize: 14,
+              letterSpacing: "0.16px",
+              background: "var(--cds-button-primary)",
+              color: "#fff",
+              border: "none",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              transition: "background 110ms cubic-bezier(0.2,0,0.38,0.9)",
             }}
           >
-            사용하기
+            Use this template
+            <CarbonIcon name="chevronRight" size={16} color="#fff" />
           </button>
         </div>
       ))}
-    </div>
+    </>
   );
 }

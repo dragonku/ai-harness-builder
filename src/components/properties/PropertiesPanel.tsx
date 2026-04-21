@@ -3,7 +3,8 @@
 import { useCallback, useMemo, useState } from "react";
 import { useHarnessStore } from "@/lib/store";
 import { RoleIcon } from "@/components/icons/RoleIcon";
-import { MC } from "@/lib/model-colors";
+import { CarbonIcon } from "@/components/icons/CarbonIcon";
+import { MODEL_META } from "@/lib/model-colors";
 import { SkillEditor } from "./SkillEditor";
 import type { ModelType, Skill } from "@/lib/types";
 
@@ -80,256 +81,258 @@ export function PropertiesPanel() {
     }
   }, [selectedNodeId, removeAgent]);
 
-  const emptyContent = (msg: string) => (
-    <aside
-      style={{
-        width: 280,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        borderLeft: "1px solid var(--border-subtle)",
-        background: "var(--bg-primary)",
-      }}
-    >
-      <p style={{ fontSize: 13, color: "var(--fg-tertiary)", padding: "0 24px", textAlign: "center" }}>
-        {msg}
-      </p>
-    </aside>
-  );
-
-  if (!harness) return emptyContent("하네스를 먼저 불러오세요");
-  if (!selectedAgent) return emptyContent("노드를 선택하면 속성을 편집할 수 있습니다");
-
-  const mc = MC[selectedAgent.model];
-
-  const sectionTitle = (text: string) => (
-    <div
-      style={{
-        fontSize: 11,
-        fontWeight: 600,
-        color: "var(--fg-tertiary)",
-        textTransform: "uppercase" as const,
-        letterSpacing: "0.5px",
-        marginBottom: 8,
-      }}
-    >
-      {text}
-    </div>
-  );
+  // Empty state
+  if (!harness || !selectedAgent) {
+    return (
+      <aside
+        style={{
+          width: 320,
+          height: "100%",
+          borderLeft: "1px solid var(--cds-border-subtle-00)",
+          background: "var(--cds-layer-01)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+        }}
+      >
+        <div style={{ textAlign: "left", padding: 24, maxWidth: 240 }}>
+          <CarbonIcon name="eye" size={20} color="var(--cds-icon-secondary)" style={{ marginBottom: 12 }} />
+          <h3 style={{ fontSize: 16, fontWeight: 600, letterSpacing: "0.16px", color: "var(--cds-text-primary)", marginBottom: 4, lineHeight: "22px" }}>
+            No selection
+          </h3>
+          <p style={{ fontSize: 14, lineHeight: "18px", letterSpacing: "0.16px", color: "var(--cds-text-secondary)" }}>
+            {harness
+              ? "Select an agent on the canvas to view and edit its properties."
+              : "Create or load a harness to begin."}
+          </p>
+        </div>
+      </aside>
+    );
+  }
 
   return (
     <aside
       style={{
-        width: 280,
+        width: 320,
+        height: "100%",
         display: "flex",
         flexDirection: "column",
-        borderLeft: "1px solid var(--border-subtle)",
-        background: "var(--bg-primary)",
-        overflow: "hidden",
+        background: "var(--cds-layer-01)",
+        borderLeft: "1px solid var(--cds-border-subtle-00)",
+        flexShrink: 0,
       }}
     >
       {/* Header */}
       <div
         style={{
-          padding: "16px",
-          borderBottom: "1px solid var(--border-subtle)",
+          padding: 16,
+          borderBottom: "1px solid var(--cds-border-subtle-00)",
           display: "flex",
           alignItems: "center",
           gap: 12,
+          background: "var(--cds-background)",
         }}
       >
         <div
           style={{
-            width: 34,
-            height: 34,
-            borderRadius: "50%",
-            background: mc.bg,
+            width: 32,
+            height: 32,
+            background: "var(--cds-layer-02)",
+            border: "1px solid var(--cds-border-subtle-00)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             flexShrink: 0,
           }}
         >
-          <RoleIcon role={selectedAgent.role} size={18} color={mc.color} />
+          <RoleIcon role={selectedAgent.role} size={16} color="var(--cds-icon-primary)" />
         </div>
-        <div>
-          <div style={{ fontSize: 14, fontWeight: 600, color: "var(--fg-primary)" }}>
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div style={{ fontSize: 16, fontWeight: 600, letterSpacing: "0.16px", color: "var(--cds-text-primary)", textTransform: "capitalize" as const, lineHeight: "22px" }}>
             {selectedAgent.role}
           </div>
-          <div style={{ fontSize: 11, color: "var(--fg-tertiary)" }}>에이전트 속성</div>
+          <div style={{ fontSize: 12, letterSpacing: "0.32px", color: "var(--cds-text-helper)", lineHeight: "16px" }}>
+            Agent properties
+          </div>
         </div>
       </div>
 
       {/* Scrollable content */}
-      <div style={{ flex: 1, overflow: "auto", padding: 16 }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          {/* Role */}
-          <div>
-            {sectionTitle("역할")}
-            <input
-              value={selectedAgent.role}
-              onChange={(e) => handleRoleChange(e.target.value)}
-              placeholder="에이전트 역할"
-              style={{
-                width: "100%",
-                height: 32,
-                padding: "0 10px",
-                borderRadius: 8,
-                border: "1px solid var(--border-default)",
-                background: "var(--bg-secondary)",
-                color: "var(--fg-primary)",
-                fontSize: 13,
-                outline: "none",
-                boxSizing: "border-box",
-              }}
-            />
+      <div style={{ flex: 1, overflowY: "auto" }}>
+        {/* Identity section */}
+        <div style={{ padding: 16 }}>
+          <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.32px", color: "var(--cds-text-secondary)", marginBottom: 8, textTransform: "uppercase" as const }}>
+            Identity
           </div>
+          <label style={{ display: "block", fontSize: 12, letterSpacing: "0.32px", color: "var(--cds-text-secondary)", marginBottom: 4 }}>
+            Role
+          </label>
+          <input
+            value={selectedAgent.role}
+            onChange={(e) => handleRoleChange(e.target.value)}
+            style={{
+              width: "100%",
+              height: 40,
+              padding: "0 16px",
+              background: "var(--cds-field-01)",
+              border: "none",
+              borderBottom: "1px solid var(--cds-border-strong-01)",
+              fontSize: 14,
+              letterSpacing: "0.16px",
+              color: "var(--cds-text-primary)",
+              outline: "none",
+              boxSizing: "border-box",
+            }}
+          />
+        </div>
+        <div style={{ height: 1, background: "var(--cds-border-subtle-00)" }} />
 
-          {/* Model - segmented control */}
-          <div>
-            {sectionTitle("모델")}
-            <div
-              style={{
-                display: "flex",
-                background: "var(--bg-secondary)",
-                borderRadius: 8,
-                padding: 2,
-                gap: 2,
-              }}
-            >
-              {models.map((m) => {
-                const isActive = selectedAgent.model === m;
-                const mColor = MC[m];
-                return (
-                  <button
-                    key={m}
-                    onClick={() => handleModelChange(m)}
-                    style={{
-                      flex: 1,
-                      padding: "6px 0",
-                      borderRadius: 6,
-                      border: "none",
-                      fontSize: 12,
-                      fontWeight: 500,
-                      cursor: "pointer",
-                      transition: "all 0.15s ease",
-                      background: isActive ? "var(--bg-primary)" : "transparent",
-                      color: isActive ? mColor.color : "var(--fg-tertiary)",
-                      boxShadow: isActive ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
-                    }}
-                  >
-                    {m.charAt(0).toUpperCase() + m.slice(1)}
-                  </button>
-                );
-              })}
-            </div>
+        {/* Model section */}
+        <div style={{ padding: 16 }}>
+          <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.32px", color: "var(--cds-text-secondary)", marginBottom: 8, textTransform: "uppercase" as const }}>
+            Model
           </div>
-
-          {/* Separator */}
-          <div style={{ height: 1, background: "var(--border-subtle)" }} />
-
-          {/* Tools */}
-          <div>
-            {sectionTitle("도구")}
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {availableTools.map((tool) => {
-                const isActive = selectedAgent.tools.includes(tool);
-                return (
-                  <button
-                    key={tool}
-                    onClick={() => handleToolToggle(tool)}
-                    style={{
-                      padding: "4px 10px",
-                      borderRadius: 6,
-                      border: `1px solid ${isActive ? "var(--accent-apple)" : "var(--border-default)"}`,
-                      background: isActive ? "rgba(0,113,227,0.08)" : "transparent",
-                      color: isActive ? "var(--accent-apple)" : "var(--fg-secondary)",
-                      fontSize: 11,
-                      fontFamily: "var(--font-mono)",
-                      fontWeight: 500,
-                      cursor: "pointer",
-                      transition: "all 0.15s ease",
-                    }}
-                  >
-                    {tool}
-                  </button>
-                );
-              })}
-            </div>
+          <div style={{ display: "flex", border: "1px solid var(--cds-border-strong-01)" }}>
+            {models.map((m) => {
+              const isActive = selectedAgent.model === m;
+              return (
+                <button
+                  key={m}
+                  onClick={() => handleModelChange(m)}
+                  style={{
+                    flex: 1,
+                    height: 40,
+                    fontSize: 14,
+                    letterSpacing: "0.16px",
+                    border: "none",
+                    cursor: "pointer",
+                    textTransform: "capitalize" as const,
+                    background: isActive ? "var(--cds-background-inverse)" : "transparent",
+                    color: isActive ? "var(--cds-text-inverse)" : "var(--cds-text-primary)",
+                    fontWeight: isActive ? 600 : 400,
+                  }}
+                >
+                  {m}
+                </button>
+              );
+            })}
           </div>
+        </div>
+        <div style={{ height: 1, background: "var(--cds-border-subtle-00)" }} />
 
-          {/* Separator */}
-          <div style={{ height: 1, background: "var(--border-subtle)" }} />
+        {/* Tools section */}
+        <div style={{ padding: 16 }}>
+          <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: "0.32px", color: "var(--cds-text-secondary)", marginBottom: 8, textTransform: "uppercase" as const }}>
+            Tools
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+            {availableTools.map((tool) => {
+              const isActive = selectedAgent.tools.includes(tool);
+              return (
+                <button
+                  key={tool}
+                  onClick={() => handleToolToggle(tool)}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    height: 24,
+                    padding: "0 8px",
+                    fontSize: 12,
+                    letterSpacing: "0.32px",
+                    fontFamily: "var(--cds-font-mono)",
+                    background: isActive ? "var(--cds-blue-20)" : "var(--cds-gray-20)",
+                    color: isActive ? "var(--cds-blue-80)" : "var(--cds-text-primary)",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  {isActive && <CarbonIcon name="checkmark" size={16} color="var(--cds-blue-80)" style={{ marginRight: 4, marginLeft: -4 }} />}
+                  {tool}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+        <div style={{ height: 1, background: "var(--cds-border-subtle-00)" }} />
 
-          {/* Skills */}
+        {/* Skills section */}
+        <div style={{ padding: 16 }}>
           <SkillEditor
             skills={[...selectedAgent.skills]}
             onChange={handleSkillsChange}
           />
+        </div>
+      </div>
 
-          {/* Separator */}
-          <div style={{ height: 1, background: "var(--border-subtle)" }} />
-
-          {/* Delete */}
-          {!showDeleteConfirm ? (
+      {/* Delete footer */}
+      <div style={{ padding: 16, borderTop: "1px solid var(--cds-border-subtle-00)", background: "var(--cds-background)" }}>
+        {!showDeleteConfirm ? (
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.background = "var(--cds-button-danger-hover)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.background = "var(--cds-button-danger)";
+            }}
+            style={{
+              width: "100%",
+              height: 48,
+              padding: "0 64px 0 16px",
+              background: "var(--cds-button-danger)",
+              color: "#fff",
+              border: "none",
+              cursor: "pointer",
+              fontSize: 14,
+              letterSpacing: "0.16px",
+              display: "flex",
+              alignItems: "center",
+              position: "relative",
+              transition: "background 110ms cubic-bezier(0.2,0,0.38,0.9)",
+            }}
+          >
+            Delete agent
+            <span style={{ position: "absolute", right: 16 }}>
+              <CarbonIcon name="trash" size={16} color="#fff" />
+            </span>
+          </button>
+        ) : (
+          <div style={{ display: "flex", gap: 1 }}>
             <button
-              onClick={() => setShowDeleteConfirm(true)}
+              onClick={() => setShowDeleteConfirm(false)}
               style={{
-                width: "100%",
-                padding: "8px 0",
-                borderRadius: 8,
-                background: "transparent",
-                color: "#ef4444",
-                fontSize: 13,
-                fontWeight: 500,
+                flex: 1,
+                height: 48,
+                padding: "0 16px",
+                background: "var(--cds-button-secondary)",
+                color: "#fff",
                 border: "none",
                 cursor: "pointer",
+                fontSize: 14,
+                letterSpacing: "0.16px",
               }}
             >
-              에이전트 삭제
+              Cancel
             </button>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              <p style={{ fontSize: 12, color: "#ef4444", textAlign: "center", margin: 0 }}>
-                정말 삭제하시겠습니까?
-              </p>
-              <div style={{ display: "flex", gap: 8 }}>
-                <button
-                  onClick={() => setShowDeleteConfirm(false)}
-                  style={{
-                    flex: 1,
-                    padding: "6px 0",
-                    borderRadius: 8,
-                    border: "1px solid var(--border-default)",
-                    background: "transparent",
-                    color: "var(--fg-secondary)",
-                    fontSize: 12,
-                    fontWeight: 500,
-                    cursor: "pointer",
-                  }}
-                >
-                  취소
-                </button>
-                <button
-                  onClick={handleDelete}
-                  style={{
-                    flex: 1,
-                    padding: "6px 0",
-                    borderRadius: 8,
-                    border: "none",
-                    background: "#ef4444",
-                    color: "#fff",
-                    fontSize: 12,
-                    fontWeight: 500,
-                    cursor: "pointer",
-                  }}
-                >
-                  확인
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+            <button
+              onClick={handleDelete}
+              style={{
+                flex: 1,
+                height: 48,
+                padding: "0 16px",
+                background: "var(--cds-button-danger)",
+                color: "#fff",
+                border: "none",
+                cursor: "pointer",
+                fontSize: 14,
+                letterSpacing: "0.16px",
+              }}
+            >
+              Confirm
+            </button>
+          </div>
+        )}
       </div>
     </aside>
   );

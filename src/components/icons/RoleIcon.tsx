@@ -1,65 +1,32 @@
 "use client";
 
-import { memo, type ReactElement } from "react";
+import { memo } from "react";
 
-const icons: Record<string, (size: number, color: string) => ReactElement> = {
-  planner: (s, c) => (
-    <svg width={s} height={s} viewBox="0 0 20 20" fill="none">
-      <path d="M10 2L3 7v6l7 5 7-5V7l-7-5z" stroke={c} strokeWidth="1.5" fill="none"/>
-      <circle cx="10" cy="10" r="2" fill={c}/>
-    </svg>
-  ),
-  architect: (s, c) => (
-    <svg width={s} height={s} viewBox="0 0 20 20" fill="none">
-      <rect x="3" y="3" width="14" height="14" rx="2" stroke={c} strokeWidth="1.5" fill="none"/>
-      <path d="M3 8h14M8 8v9" stroke={c} strokeWidth="1.5"/>
-    </svg>
-  ),
-  executor: (s, c) => (
-    <svg width={s} height={s} viewBox="0 0 20 20" fill="none">
-      <rect x="3" y="4" width="14" height="12" rx="2" stroke={c} strokeWidth="1.5" fill="none"/>
-      <path d="M7 9l2 2 4-4" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  ),
-  reviewer: (s, c) => (
-    <svg width={s} height={s} viewBox="0 0 20 20" fill="none">
-      <circle cx="9" cy="9" r="5" stroke={c} strokeWidth="1.5" fill="none"/>
-      <path d="M13 13l4 4" stroke={c} strokeWidth="1.5" strokeLinecap="round"/>
-    </svg>
-  ),
-  tester: (s, c) => (
-    <svg width={s} height={s} viewBox="0 0 20 20" fill="none">
-      <path d="M7 3v4l-3 6a2 2 0 002 2h8a2 2 0 002-2l-3-6V3" stroke={c} strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-      <path d="M6 3h8" stroke={c} strokeWidth="1.5" strokeLinecap="round"/>
-    </svg>
-  ),
-  designer: (s, c) => (
-    <svg width={s} height={s} viewBox="0 0 20 20" fill="none">
-      <path d="M4 16l1.4-3.2L14 4.2a1.4 1.4 0 012 0l.8.8a1.4 1.4 0 010 2L8.2 15.6 4 16z" stroke={c} strokeWidth="1.5" fill="none"/>
-    </svg>
-  ),
-  writer: (s, c) => (
-    <svg width={s} height={s} viewBox="0 0 20 20" fill="none">
-      <path d="M4 4h12M4 8h10M4 12h8M4 16h6" stroke={c} strokeWidth="1.5" strokeLinecap="round"/>
-    </svg>
-  ),
-  debugger: (s, c) => (
-    <svg width={s} height={s} viewBox="0 0 20 20" fill="none">
-      <circle cx="10" cy="11" r="5" stroke={c} strokeWidth="1.5" fill="none"/>
-      <path d="M10 6V3M5.5 7.5L3 5.5M14.5 7.5L17 5.5M5 11H2M15 11h3M5.5 14.5L3 16.5M14.5 14.5L17 16.5" stroke={c} strokeWidth="1.5" strokeLinecap="round"/>
-    </svg>
-  ),
+const ROLE_PATHS: Record<string, string> = {
+  planner: "M6 4h20v2H6zm0 6h20v2H6zm0 6h14v2H6zm0 6h20v2H6z",
+  architect: "M4 4v24h24V4zm22 22H6V6h20zm-4-4v-2h-4V8h-2v12h-4v2z",
+  executor: "M10 8v4L2 16l8 4v4l10-6v-4zm2 8l-6 3v-6z",
+  reviewer: "M30 28.6L20.4 19a10 10 0 10-1.4 1.4L28.6 30zM5 13a8 8 0 118 8 8 8 0 01-8-8z",
+  tester: "M22 28H10a2 2 0 01-2-2V14h16v12a2 2 0 01-2 2zm-12-12v10h12V16zm-4-8h20v2H6zm2-4h16v2H8z",
+  designer: "M27.86 9.86l-4.32-4.32a2 2 0 00-2.83 0L4 22.25V28h5.75L25.86 11.86a2 2 0 000-2.83zM9.42 26H6v-3.42L18 10.58 21.42 14zM22.59 12.59L19.41 9.41l2-2 3.18 3.18z",
+  writer: "M25.4 9l-6.4-6.4a2 2 0 00-2.83 0L4 14.75V24h9.25l14-14a2 2 0 000-2.83zm-13 13L6 15.41 17.58 3.83 24 10.42z",
+  debugger: "M30 6h-2v2a10 10 0 00-20 0v2H6v4h2v2a10 10 0 0010 10v2h-2v4h4v-2a10 10 0 0010-10v-2h2v-4h-2v-2a10 10 0 00-10-10V0z",
 };
 
 interface RoleIconProps {
-  role: string;
-  size?: number;
-  color?: string;
+  readonly role: string;
+  readonly size?: number;
+  readonly color?: string;
 }
 
-function RoleIconComponent({ role, size = 18, color = "currentColor" }: RoleIconProps) {
-  const render = icons[role] ?? icons.executor;
-  return render(size, color);
+function RoleIconComponent({ role, size = 16, color = "currentColor" }: RoleIconProps) {
+  return (
+    <span style={{ display: "inline-flex", width: size, height: size, flexShrink: 0 }}>
+      <svg width={size} height={size} viewBox="0 0 32 32" fill={color}>
+        <path d={ROLE_PATHS[role] ?? ROLE_PATHS.executor} />
+      </svg>
+    </span>
+  );
 }
 
 export const RoleIcon = memo(RoleIconComponent);

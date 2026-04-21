@@ -7,6 +7,7 @@ import {
   type EdgeProps,
 } from "reactflow";
 import { useHarnessStore } from "@/lib/store";
+import { CarbonIcon } from "@/components/icons/CarbonIcon";
 import type { EdgeType } from "@/lib/types";
 
 interface OrchestratorEdgeData {
@@ -37,12 +38,32 @@ function OrchestratorEdgeComponent({
   });
 
   const isParallel = data?.edgeType === "parallel";
-  const strokeColor = isHovered
-    ? (isParallel ? "#af52de" : "#6b7280")
-    : (isParallel ? "#af52de" : "#d1d5db");
+  const color = isHovered
+    ? (isParallel ? "var(--cds-purple-70)" : "var(--cds-blue-70)")
+    : (isParallel ? "var(--cds-purple-60)" : "var(--cds-gray-70)");
+
+  const markerId = isParallel
+    ? (isHovered ? "arr-par-h" : "arr-par")
+    : (isHovered ? "arr-seq-h" : "arr-seq");
 
   return (
     <>
+      {/* Arrow markers */}
+      <defs>
+        <marker id="arr-seq" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+          <path d="M0,0 L9,5 L0,10 L2,5 z" fill="var(--cds-gray-70)" />
+        </marker>
+        <marker id="arr-seq-h" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+          <path d="M0,0 L9,5 L0,10 L2,5 z" fill="var(--cds-blue-70)" />
+        </marker>
+        <marker id="arr-par" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+          <path d="M0,0 L9,5 L0,10 L2,5 z" fill="var(--cds-purple-60)" />
+        </marker>
+        <marker id="arr-par-h" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+          <path d="M0,0 L9,5 L0,10 L2,5 z" fill="var(--cds-purple-70)" />
+        </marker>
+      </defs>
+
       {/* Invisible wide path for hover */}
       <path
         d={edgePath}
@@ -57,28 +78,12 @@ function OrchestratorEdgeComponent({
       <path
         d={edgePath}
         fill="none"
-        stroke={strokeColor}
-        strokeWidth={isHovered ? 2.5 : 2}
-        strokeDasharray={isParallel ? "6 4" : "none"}
-        markerEnd={!isParallel ? "url(#arrowhead)" : undefined}
-        style={{ transition: "stroke 0.15s ease, stroke-width 0.15s ease", pointerEvents: "none" }}
+        stroke={color}
+        strokeWidth={isHovered ? 2 : 1.5}
+        strokeDasharray={isParallel ? "4 3" : "none"}
+        markerEnd={`url(#${markerId})`}
+        style={{ transition: "stroke 110ms cubic-bezier(0.2,0,0.38,0.9)", pointerEvents: "none" }}
       />
-      {/* Arrowhead marker */}
-      <defs>
-        <marker
-          id="arrowhead"
-          markerWidth="10"
-          markerHeight="7"
-          refX="10"
-          refY="3.5"
-          orient="auto"
-        >
-          <polygon
-            points="0 0, 10 3.5, 0 7"
-            fill={strokeColor}
-          />
-        </marker>
-      </defs>
 
       {/* Parallel label */}
       {isParallel && (
@@ -89,14 +94,14 @@ function OrchestratorEdgeComponent({
               transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
               display: "flex",
               alignItems: "center",
-              gap: 4,
-              background: "var(--model-opus-bg)",
-              border: "1px solid var(--model-opus-border)",
-              borderRadius: 6,
-              padding: "2px 8px",
-              fontSize: 10,
-              fontWeight: 500,
-              color: "var(--model-opus)",
+              height: 20,
+              lineHeight: "20px",
+              padding: "0 8px",
+              fontSize: 12,
+              letterSpacing: "0.32px",
+              background: "var(--cds-purple-30)",
+              color: "var(--cds-purple-70)",
+              whiteSpace: "nowrap",
             }}
           >
             parallel
@@ -111,12 +116,12 @@ function OrchestratorEdgeComponent({
             className="nodrag nopan pointer-events-none absolute"
             style={{
               transform: `translate(-50%, ${isParallel ? "50%" : "-50%"}) translate(${labelX}px,${labelY + (isParallel ? 16 : 0)}px)`,
-              background: "var(--bg-elevated)",
-              border: "1px solid var(--border-subtle)",
-              borderRadius: 6,
+              background: "var(--cds-layer-02)",
+              border: "1px solid var(--cds-border-subtle-00)",
               padding: "2px 8px",
-              fontSize: 10,
-              color: "var(--fg-tertiary)",
+              fontSize: 12,
+              letterSpacing: "0.32px",
+              color: "var(--cds-text-helper)",
             }}
           >
             {data.condition}
@@ -124,7 +129,7 @@ function OrchestratorEdgeComponent({
         </EdgeLabelRenderer>
       )}
 
-      {/* Delete button on hover */}
+      {/* Delete button on hover - square */}
       {isHovered && (
         <EdgeLabelRenderer>
           <div
@@ -138,22 +143,17 @@ function OrchestratorEdgeComponent({
               style={{
                 width: 20,
                 height: 20,
-                borderRadius: "50%",
-                background: "#ef4444",
+                background: "var(--cds-button-danger)",
                 color: "#fff",
-                border: "2px solid var(--bg-primary)",
-                fontSize: 12,
-                fontWeight: 700,
+                border: "none",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 cursor: "pointer",
-                lineHeight: 1,
-                boxShadow: "var(--shadow-node)",
               }}
               aria-label="Delete edge"
             >
-              &times;
+              <CarbonIcon name="close" size={16} color="#fff" />
             </button>
           </div>
         </EdgeLabelRenderer>

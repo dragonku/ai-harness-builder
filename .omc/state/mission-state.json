@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-21T11:38:20.303Z",
+  "updatedAt": "2026-04-21T23:16:28.474Z",
   "missions": [
     {
       "id": "session:7afb2992-c33e-4151-8b2d-1d63dc424aff:none",
@@ -7,15 +7,15 @@
       "name": "none",
       "objective": "Session mission",
       "createdAt": "2026-04-21T11:32:09.752Z",
-      "updatedAt": "2026-04-21T11:38:20.303Z",
+      "updatedAt": "2026-04-21T23:16:28.474Z",
       "status": "done",
-      "workerCount": 1,
+      "workerCount": 2,
       "taskCounts": {
-        "total": 1,
+        "total": 2,
         "pending": 0,
         "blocked": 0,
         "inProgress": 0,
-        "completed": 1,
+        "completed": 2,
         "failed": 0
       },
       "agents": [
@@ -28,6 +28,16 @@
           "latestUpdate": "completed",
           "completedSummary": null,
           "updatedAt": "2026-04-21T11:38:20.303Z"
+        },
+        {
+          "name": "general-purpose:a38d9fb",
+          "role": "general-purpose",
+          "ownership": "a38d9fb574b5b6212",
+          "status": "done",
+          "currentStep": null,
+          "latestUpdate": "completed",
+          "completedSummary": null,
+          "updatedAt": "2026-04-21T23:16:28.474Z"
         }
       ],
       "timeline": [
@@ -46,6 +56,22 @@
           "agent": "general-purpose:a497eb7",
           "detail": "completed",
           "sourceKey": "session-stop:a497eb787bc7f3ee6"
+        },
+        {
+          "id": "session-start:a38d9fb574b5b6212:2026-04-21T23:07:06.162Z",
+          "at": "2026-04-21T23:07:06.162Z",
+          "kind": "update",
+          "agent": "general-purpose:a38d9fb",
+          "detail": "started general-purpose:a38d9fb",
+          "sourceKey": "session-start:a38d9fb574b5b6212"
+        },
+        {
+          "id": "session-stop:a38d9fb574b5b6212:2026-04-21T23:16:28.474Z",
+          "at": "2026-04-21T23:16:28.474Z",
+          "kind": "completion",
+          "agent": "general-purpose:a38d9fb",
+          "detail": "completed",
+          "sourceKey": "session-stop:a38d9fb574b5b6212"
         }
       ]
     }

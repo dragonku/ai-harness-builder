@@ -1,8 +1,9 @@
 "use client";
 
-import type { DragEvent } from "react";
+import { useState, type DragEvent } from "react";
 import { RoleIcon } from "@/components/icons/RoleIcon";
-import { MC } from "@/lib/model-colors";
+import { CarbonIcon } from "@/components/icons/CarbonIcon";
+import { MODEL_META } from "@/lib/model-colors";
 import type { ModelType } from "@/lib/types";
 
 interface PaletteAgent {
@@ -13,104 +14,80 @@ interface PaletteAgent {
 }
 
 const paletteAgents: readonly PaletteAgent[] = [
-  { role: "planner", model: "opus", label: "Planner", description: "계획 수립 및 작업 분해" },
-  { role: "architect", model: "opus", label: "Architect", description: "시스템 설계 및 구조" },
-  { role: "executor", model: "sonnet", label: "Executor", description: "코드 구현 및 실행" },
-  { role: "reviewer", model: "sonnet", label: "Reviewer", description: "코드 리뷰 및 검증" },
-  { role: "tester", model: "sonnet", label: "Tester", description: "테스트 작성 및 QA" },
-  { role: "designer", model: "sonnet", label: "Designer", description: "UI/UX 설계" },
-  { role: "writer", model: "haiku", label: "Writer", description: "문서 및 가이드 작성" },
-  { role: "debugger", model: "sonnet", label: "Debugger", description: "버그 분석 및 수정" },
+  { role: "planner", model: "opus", label: "Planner", description: "Decompose tasks and plan" },
+  { role: "architect", model: "opus", label: "Architect", description: "Design system structure" },
+  { role: "executor", model: "sonnet", label: "Executor", description: "Write and run code" },
+  { role: "reviewer", model: "sonnet", label: "Reviewer", description: "Review code quality" },
+  { role: "tester", model: "sonnet", label: "Tester", description: "Author and run tests" },
+  { role: "designer", model: "sonnet", label: "Designer", description: "Design UI and UX" },
+  { role: "writer", model: "haiku", label: "Writer", description: "Write documentation" },
+  { role: "debugger", model: "sonnet", label: "Debugger", description: "Trace and fix bugs" },
 ];
 
 export function AgentPalette() {
-  const onDragStart = (event: DragEvent, role: string) => {
-    event.dataTransfer.setData("application/harness-agent-role", role);
+  const [hoverAgent, setHoverAgent] = useState<string | null>(null);
+
+  const onDragStart = (event: DragEvent, agent: PaletteAgent) => {
+    event.dataTransfer.setData("application/harness-agent-role", agent.role);
+    event.dataTransfer.setData("application/harness-agent-model", agent.model);
     event.dataTransfer.effectAllowed = "move";
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+    <>
+      <div style={{ fontSize: 12, letterSpacing: "0.32px", color: "var(--cds-text-helper)", padding: "12px 16px 8px" }}>
+        Drag an agent onto the canvas
+      </div>
       {paletteAgents.map((agent) => {
-        const mc = MC[agent.model];
+        const hov = hoverAgent === agent.role;
+        const meta = MODEL_META[agent.model];
         return (
           <div
             key={agent.role}
             draggable
-            onDragStart={(e) => onDragStart(e, agent.role)}
+            onDragStart={(e) => onDragStart(e, agent)}
+            onMouseEnter={() => setHoverAgent(agent.role)}
+            onMouseLeave={() => setHoverAgent(null)}
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 10,
-              padding: "10px 12px",
-              borderRadius: 10,
-              background: "var(--bg-primary)",
-              border: "1px solid var(--border-subtle)",
+              gap: 12,
+              padding: hov ? "0 16px 0 13px" : "0 16px",
+              height: 56,
               cursor: "grab",
-              transition: "background 0.15s ease",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.background = "var(--bg-elevated)";
-              (e.currentTarget as HTMLElement).style.boxShadow = "var(--shadow-node)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.background = "var(--bg-primary)";
-              (e.currentTarget as HTMLElement).style.boxShadow = "none";
+              background: hov ? "var(--cds-layer-hover-01)" : "transparent",
+              borderLeft: hov ? "3px solid var(--cds-interactive)" : "3px solid transparent",
+              transition: "background 110ms cubic-bezier(0.2,0,0.38,0.9)",
             }}
           >
-            {/* Role icon */}
-            <div
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: "50%",
-                background: mc.bg,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
-              }}
-            >
-              <RoleIcon role={agent.role} size={16} color={mc.color} />
-            </div>
-
+            <CarbonIcon name="dragVertical" size={16} color="var(--cds-icon-secondary)" />
+            <RoleIcon role={agent.role} size={16} color="var(--cds-icon-primary)" />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div
-                style={{
-                  fontSize: 13,
-                  fontWeight: 500,
-                  color: "var(--fg-primary)",
-                  marginBottom: 2,
-                }}
-              >
+              <div style={{ fontSize: 14, color: "var(--cds-text-primary)", letterSpacing: "0.16px", lineHeight: "18px" }}>
                 {agent.label}
               </div>
-              <div style={{ fontSize: 11, color: "var(--fg-tertiary)", lineHeight: 1.3 }}>
+              <div style={{ fontSize: 12, color: "var(--cds-text-helper)", letterSpacing: "0.32px", lineHeight: "16px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                 {agent.description}
               </div>
             </div>
-
-            {/* Model pill */}
             <span
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                height: 18,
-                padding: "0 7px",
-                borderRadius: 9,
-                fontSize: 10,
-                fontWeight: 500,
-                background: mc.bg,
-                color: mc.color,
-                border: `1px solid ${mc.border}`,
+                height: 20,
+                padding: "0 8px",
+                fontSize: 12,
+                letterSpacing: "0.32px",
+                background: meta.tagBg,
+                color: meta.tagFg,
                 flexShrink: 0,
               }}
             >
-              {agent.model}
+              {meta.label}
             </span>
           </div>
         );
       })}
-    </div>
+    </>
   );
 }

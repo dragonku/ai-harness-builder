@@ -3,7 +3,7 @@
 import { memo, useState, useRef } from "react";
 import { Handle, Position, type NodeProps } from "reactflow";
 import { useHarnessStore } from "@/lib/store";
-import { MC } from "@/lib/model-colors";
+import { MODEL_META } from "@/lib/model-colors";
 import { RoleIcon } from "@/components/icons/RoleIcon";
 import type { ModelType } from "@/lib/types";
 
@@ -22,7 +22,7 @@ function AgentNodeComponent({ id, data }: NodeProps<AgentNodeData>) {
   const [showTooltip, setShowTooltip] = useState(false);
   const tooltipTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const mc = MC[data.model];
+  const m = MODEL_META[data.model];
 
   const handleMouseEnter = () => {
     setIsHovered(true);
@@ -46,82 +46,52 @@ function AgentNodeComponent({ id, data }: NodeProps<AgentNodeData>) {
       onMouseLeave={handleMouseLeave}
       style={{
         position: "relative",
-        minWidth: 180,
-        background: "var(--bg-primary)",
-        borderRadius: 12,
-        border: "1px solid var(--border-subtle)",
-        boxShadow: isSelected
-          ? "var(--shadow-node-selected)"
-          : isHovered
-            ? "var(--shadow-node-hover)"
-            : "var(--shadow-node)",
-        transition: "box-shadow 0.2s ease, transform 0.2s ease",
-        transform: isHovered ? "translateY(-1px)" : "none",
-        overflow: "hidden",
+        width: 200,
+        minHeight: 84,
+        background: "var(--cds-layer-02)",
+        border: "1px solid var(--cds-border-subtle-00)",
+        outline: isSelected ? "2px solid var(--cds-focus)" : "none",
+        outlineOffset: -1,
         cursor: "grab",
+        userSelect: "none",
+        zIndex: isSelected ? 10 : isHovered ? 5 : 1,
+        boxShadow: isSelected ? "0 2px 6px rgba(0,0,0,0.3)" : isHovered ? "0 1px 3px rgba(0,0,0,0.15)" : "none",
       }}
     >
-      {/* Top color bar */}
-      <div style={{ height: 3, background: mc.color, width: "100%" }} />
+      {/* Left color bar */}
+      <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3, background: m.dotColor }} />
 
-      <div style={{ padding: "12px 14px 14px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-          {/* Role icon */}
-          <div
-            style={{
-              width: 28,
-              height: 28,
-              borderRadius: "50%",
-              background: mc.bg,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}
-          >
-            <RoleIcon role={data.role} size={15} color={mc.color} />
-          </div>
-
-          <span
-            style={{
-              fontSize: 13,
-              fontWeight: 600,
-              color: "var(--fg-primary)",
-              letterSpacing: "-0.01em",
-            }}
-          >
+      <div style={{ padding: "12px 16px 12px 19px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+          <RoleIcon role={data.role} size={16} color="var(--cds-icon-primary)" />
+          <span style={{ fontSize: 14, fontWeight: 600, letterSpacing: "0.16px", color: "var(--cds-text-primary)", textTransform: "capitalize" as const }}>
             {data.role}
           </span>
         </div>
-
-        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-          {/* Model badge */}
+        <div style={{ display: "flex", gap: 4, alignItems: "center", flexWrap: "wrap" }}>
+          {/* Model tag - flat rectangle */}
           <span
             style={{
               display: "inline-flex",
               alignItems: "center",
               height: 20,
               padding: "0 8px",
-              borderRadius: 10,
-              fontSize: 11,
-              fontWeight: 500,
-              background: mc.bg,
-              color: mc.color,
-              border: `1px solid ${mc.border}`,
+              fontSize: 12,
+              letterSpacing: "0.32px",
+              background: m.tagBg,
+              color: m.tagFg,
             }}
           >
-            {data.model}
+            {m.label}
           </span>
-
           {data.skillCount > 0 && (
-            <span style={{ fontSize: 11, color: "var(--fg-tertiary)" }}>
+            <span style={{ fontSize: 12, letterSpacing: "0.32px", color: "var(--cds-text-helper)" }}>
               {data.skillCount} skill{data.skillCount > 1 ? "s" : ""}
             </span>
           )}
-
           {data.toolCount > 0 && (
-            <span style={{ fontSize: 11, color: "var(--fg-tertiary)" }}>
-              {data.toolCount} tool{data.toolCount > 1 ? "s" : ""}
+            <span style={{ fontSize: 12, letterSpacing: "0.32px", color: "var(--cds-text-helper)" }}>
+              &middot; {data.toolCount} tool{data.toolCount > 1 ? "s" : ""}
             </span>
           )}
         </div>
@@ -135,13 +105,13 @@ function AgentNodeComponent({ id, data }: NodeProps<AgentNodeData>) {
             bottom: "calc(100% + 6px)",
             left: "50%",
             transform: "translateX(-50%)",
-            background: "var(--bg-elevated)",
-            border: "1px solid var(--border-default)",
-            borderRadius: 8,
+            background: "var(--cds-layer-02)",
+            border: "1px solid var(--cds-border-subtle-00)",
             padding: "6px 10px",
-            boxShadow: "var(--shadow-float)",
-            fontSize: 11,
-            color: "var(--fg-secondary)",
+            boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+            fontSize: 12,
+            letterSpacing: "0.32px",
+            color: "var(--cds-text-secondary)",
             whiteSpace: "nowrap",
             zIndex: 100,
             pointerEvents: "none",
@@ -151,28 +121,30 @@ function AgentNodeComponent({ id, data }: NodeProps<AgentNodeData>) {
         </div>
       )}
 
+      {/* Input handle - square */}
       <Handle
         type="target"
         position={Position.Left}
         style={{
-          width: 12,
-          height: 12,
-          borderRadius: "50%",
-          border: `2px solid ${mc.color}`,
-          background: "var(--bg-primary)",
-          left: -6,
+          width: 10,
+          height: 10,
+          borderRadius: 0,
+          border: "1px solid var(--cds-border-strong-01)",
+          background: "var(--cds-layer-02)",
+          left: -5,
         }}
       />
+      {/* Output handle - square, filled */}
       <Handle
         type="source"
         position={Position.Right}
         style={{
-          width: 12,
-          height: 12,
-          borderRadius: "50%",
-          border: `2px solid ${mc.color}`,
-          background: "var(--bg-primary)",
-          right: -6,
+          width: 10,
+          height: 10,
+          borderRadius: 0,
+          border: "1px solid var(--cds-interactive)",
+          background: "var(--cds-interactive)",
+          right: -5,
         }}
       />
     </div>

@@ -18,13 +18,13 @@ import {
   downloadBlob,
   type ExportFormat,
 } from "@/lib/export/zip";
-import { Button } from "@/components/ui/button";
+import { CarbonIcon, type CarbonIconName } from "@/components/icons/CarbonIcon";
 
-const formats: { value: ExportFormat; label: string; icon: string; color: string }[] = [
-  { value: "claude-code", label: "Claude Code", icon: "{ }", color: "#0071e3" },
-  { value: "yaml", label: "YAML", icon: "Y", color: "#34c759" },
-  { value: "json", label: "JSON", icon: "J", color: "#af52de" },
-  { value: "all", label: "모두 포함", icon: "*", color: "#ff9500" },
+const formats: { value: ExportFormat; label: string; desc: string; icon: CarbonIconName }[] = [
+  { value: "claude-code", label: "Claude Code", desc: "AGENTS.md + skills/ directory", icon: "workflow" },
+  { value: "yaml", label: "YAML", desc: "Pipeline definition as YAML", icon: "file" },
+  { value: "json", label: "JSON", desc: "Structured JSON format", icon: "code" },
+  { value: "all", label: "All formats", desc: "Every format bundled as ZIP", icon: "package" },
 ];
 
 export function ExportDialog() {
@@ -62,110 +62,115 @@ export function ExportDialog() {
         render={
           <button
             style={{
-              padding: "6px 18px",
-              borderRadius: 980,
-              background: "var(--accent-apple)",
-              color: "#fff",
-              fontSize: 12,
-              fontWeight: 500,
+              width: 48,
+              height: 48,
+              background: "transparent",
               border: "none",
+              color: "#fff",
               cursor: "pointer",
-              transition: "opacity 0.15s ease",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "background 110ms cubic-bezier(0.2,0,0.38,0.9)",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.background = "var(--cds-gray-80-hover)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.background = "transparent";
             }}
             disabled={!harness}
+            title="Export"
           >
-            내보내기
+            <CarbonIcon name="share" size={20} />
           </button>
         }
       />
       <DialogContent
         className=""
+        showCloseButton={false}
         style={{
-          maxWidth: 420,
-          borderRadius: 16,
+          maxWidth: 560,
+          borderRadius: 0,
           padding: 0,
           overflow: "hidden",
-          animation: "fadeIn 0.2s ease",
         }}
       >
-        <DialogHeader style={{ padding: "20px 20px 0" }}>
-          <DialogTitle style={{ fontSize: 17, fontWeight: 600, color: "var(--fg-primary)" }}>
-            하네스 내보내기
+        {/* Header */}
+        <div style={{ padding: "16px 48px 0 16px", position: "relative" }}>
+          <div style={{ fontSize: 12, letterSpacing: "0.32px", color: "var(--cds-text-helper)", marginBottom: 4 }}>Export</div>
+          <DialogTitle style={{ fontSize: 20, lineHeight: "28px", fontWeight: 400, color: "var(--cds-text-primary)", marginBottom: 4 }}>
+            Export harness
           </DialogTitle>
-          <DialogDescription style={{ fontSize: 13, color: "var(--fg-tertiary)" }}>
-            내보내기 형식을 선택하고 ZIP으로 다운로드합니다.
+          <DialogDescription style={{ fontSize: 14, lineHeight: "18px", letterSpacing: "0.16px", color: "var(--cds-text-secondary)" }}>
+            Select a format and download the archive.
           </DialogDescription>
-        </DialogHeader>
+          <DialogClose
+            render={
+              <button
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  right: 0,
+                  width: 48,
+                  height: 48,
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "var(--cds-icon-primary)",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = "var(--cds-background-hover)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = "transparent";
+                }}
+              >
+                <CarbonIcon name="close" size={20} />
+              </button>
+            }
+          />
+        </div>
 
-        <div style={{ padding: "16px 20px" }}>
-          {/* Format cards */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+        {/* Format selection */}
+        <div style={{ padding: "24px 16px 16px" }}>
+          <div style={{ fontSize: 12, letterSpacing: "0.32px", color: "var(--cds-text-secondary)", marginBottom: 8 }}>Format</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 1, background: "var(--cds-border-subtle-00)" }}>
             {formats.map((f) => {
-              const isSelected = format === f.value;
+              const active = format === f.value;
               return (
-                <button
+                <label
                   key={f.value}
                   onClick={() => setFormat(f.value)}
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: 10,
-                    padding: "10px 12px",
-                    borderRadius: 10,
-                    border: `1.5px solid ${isSelected ? f.color : "var(--border-subtle)"}`,
-                    background: isSelected ? `${f.color}08` : "var(--bg-secondary)",
+                    gap: 12,
+                    padding: active ? "12px 16px 12px 13px" : "12px 16px",
                     cursor: "pointer",
-                    transition: "all 0.15s ease",
-                    textAlign: "left",
+                    background: active ? "var(--cds-layer-selected-01)" : "var(--cds-layer-01)",
+                    borderLeft: active ? "3px solid var(--cds-interactive)" : "3px solid transparent",
                   }}
                 >
-                  {/* Radio indicator */}
                   <div
                     style={{
                       width: 16,
                       height: 16,
                       borderRadius: "50%",
-                      border: `2px solid ${isSelected ? f.color : "var(--border-default)"}`,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
+                      border: active ? "5px solid var(--cds-interactive)" : "1px solid var(--cds-border-strong-01)",
+                      background: active ? "var(--cds-background)" : "transparent",
                       flexShrink: 0,
                     }}
-                  >
-                    {isSelected && (
-                      <div
-                        style={{
-                          width: 8,
-                          height: 8,
-                          borderRadius: "50%",
-                          background: f.color,
-                        }}
-                      />
-                    )}
+                  />
+                  <CarbonIcon name={f.icon} size={20} color="var(--cds-icon-primary)" />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, letterSpacing: "0.16px", color: "var(--cds-text-primary)" }}>{f.label}</div>
+                    <div style={{ fontSize: 12, letterSpacing: "0.32px", color: "var(--cds-text-helper)", marginTop: 2 }}>{f.desc}</div>
                   </div>
-                  {/* Icon in colored square */}
-                  <div
-                    style={{
-                      width: 24,
-                      height: 24,
-                      borderRadius: 6,
-                      background: `${f.color}15`,
-                      color: f.color,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: 11,
-                      fontWeight: 700,
-                      fontFamily: "var(--font-mono)",
-                      flexShrink: 0,
-                    }}
-                  >
-                    {f.icon}
-                  </div>
-                  <span style={{ fontSize: 12, fontWeight: 500, color: "var(--fg-primary)" }}>
-                    {f.label}
-                  </span>
-                </button>
+                </label>
               );
             })}
           </div>
@@ -174,86 +179,96 @@ export function ExportDialog() {
           {errors.length > 0 && (
             <div
               style={{
-                marginTop: 12,
-                padding: 12,
-                borderRadius: 10,
-                background: "rgba(239,68,68,0.08)",
-                border: "1px solid rgba(239,68,68,0.15)",
+                marginTop: 16,
+                display: "flex",
+                alignItems: "flex-start",
+                padding: "14px 16px",
+                gap: 12,
+                borderLeft: "3px solid var(--cds-support-error)",
+                background: "var(--cds-red-10)",
               }}
             >
-              <p style={{ fontSize: 12, fontWeight: 600, color: "#ef4444", marginBottom: 6 }}>
-                검증 오류가 있습니다:
-              </p>
-              <ul style={{ margin: 0, paddingLeft: 16 }}>
-                {errors.map((err, i) => (
-                  <li key={i} style={{ fontSize: 11, color: "#ef4444", marginBottom: 2 }}>
-                    {err.message}
-                  </li>
-                ))}
-              </ul>
+              <CarbonIcon name="warning" size={20} color="var(--cds-support-error)" />
+              <div style={{ fontSize: 14, lineHeight: "18px", letterSpacing: "0.16px", color: "var(--cds-text-primary)" }}>
+                <strong>Validation failed. </strong>
+                <ul style={{ listStyle: "none", margin: "4px 0 0", padding: 0 }}>
+                  {errors.map((err, i) => (
+                    <li key={i}>&middot; {err.message}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
           )}
 
           {/* Progress bar */}
           {progress && (
-            <div
-              style={{
-                marginTop: 12,
-                height: 3,
-                borderRadius: 2,
-                background: "var(--border-subtle)",
-                overflow: "hidden",
-              }}
-            >
-              <div
-                style={{
-                  height: "100%",
-                  background: "var(--accent-apple)",
-                  borderRadius: 2,
-                  animation: "exportProgress 1.5s ease forwards",
-                }}
-              />
+            <div style={{ marginTop: 16 }}>
+              <div style={{ fontSize: 12, letterSpacing: "0.32px", color: "var(--cds-text-secondary)", marginBottom: 4 }}>Exporting...</div>
+              <div style={{ height: 4, background: "var(--cds-layer-01)", overflow: "hidden" }}>
+                <div style={{ height: "100%", background: "var(--cds-interactive)", animation: "exportProgress 1.2s cubic-bezier(0.2,0,0.38,0.9)" }} />
+              </div>
             </div>
           )}
         </div>
 
-        <DialogFooter style={{ padding: "12px 20px", display: "flex", justifyContent: "flex-end", gap: 8 }}>
-          <DialogClose
-            render={
-              <button
-                style={{
-                  padding: "8px 18px",
-                  borderRadius: 980,
-                  border: "1px solid var(--border-default)",
-                  background: "transparent",
-                  color: "var(--fg-secondary)",
-                  fontSize: 13,
-                  fontWeight: 500,
-                  cursor: "pointer",
-                }}
-              >
-                취소
-              </button>
-            }
-          />
-          <Button
-            size="sm"
-            onClick={handleExport}
-            disabled={exporting}
-            style={{
-              padding: "8px 18px",
-              borderRadius: 980,
-              background: "var(--accent-apple)",
-              color: "#fff",
-              fontSize: 13,
-              fontWeight: 500,
-              border: "none",
-              cursor: exporting ? "not-allowed" : "pointer",
-              opacity: exporting ? 0.6 : 1,
-            }}
-          >
-            {exporting ? "내보내는 중..." : "내보내기"}
-          </Button>
+        {/* Footer buttons */}
+        <DialogFooter style={{ margin: 0, padding: 0, borderRadius: 0, border: "none", background: "transparent" }}>
+          <div style={{ display: "flex", width: "100%" }}>
+            <DialogClose
+              render={
+                <button
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLElement).style.background = "var(--cds-button-secondary-hover)";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.background = "var(--cds-button-secondary)";
+                  }}
+                  style={{
+                    flex: 1,
+                    height: 64,
+                    padding: "0 16px",
+                    background: "var(--cds-button-secondary)",
+                    color: "#fff",
+                    border: "none",
+                    cursor: "pointer",
+                    fontSize: 14,
+                    letterSpacing: "0.16px",
+                    textAlign: "left",
+                  }}
+                >
+                  Cancel
+                </button>
+              }
+            />
+            <button
+              onClick={handleExport}
+              disabled={exporting}
+              onMouseEnter={(e) => {
+                if (!exporting) (e.currentTarget as HTMLElement).style.background = "var(--cds-button-primary-hover)";
+              }}
+              onMouseLeave={(e) => {
+                if (!exporting) (e.currentTarget as HTMLElement).style.background = "var(--cds-button-primary)";
+              }}
+              style={{
+                flex: 1,
+                height: 64,
+                padding: "0 64px 0 16px",
+                background: exporting ? "var(--cds-button-disabled)" : "var(--cds-button-primary)",
+                color: "#fff",
+                border: "none",
+                cursor: exporting ? "not-allowed" : "pointer",
+                fontSize: 14,
+                letterSpacing: "0.16px",
+                textAlign: "left",
+                position: "relative",
+              }}
+            >
+              {exporting ? "Exporting..." : "Export"}
+              <span style={{ position: "absolute", right: 16, top: "50%", transform: "translateY(-50%)" }}>
+                <CarbonIcon name="download" size={20} color="#fff" />
+              </span>
+            </button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

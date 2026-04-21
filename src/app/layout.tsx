@@ -1,11 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "AI 하네스 빌더",
@@ -18,8 +12,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" data-theme="light" className={`${inter.variable} h-full antialiased`} style={{ WebkitFontSmoothing: "antialiased" }}>
-      <body className="min-h-full flex flex-col" style={{ fontFamily: "var(--font-body)" }}>{children}</body>
+    <html lang="ko" data-carbon-theme="white" className="h-full" style={{ WebkitFontSmoothing: "antialiased" }}>
+      <body className="min-h-full flex flex-col" style={{ fontFamily: "var(--cds-font-sans)" }}>{children}</body>
     </html>
   );
 }
